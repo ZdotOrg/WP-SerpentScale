@@ -1,19 +1,17 @@
 <?php
+require_once __DIR__ . '/functions.php';
 
 function saveLeaderboardEntry() {
     $leaderboard = readJsonFile(LEADERBOARD_FILE);
     
-    // Calculate total rolls (sum of both players if 2-player)
-    $totalRolls = count($_SESSION['roll_history_p1']) + count($_SESSION['roll_history_p2']);
-    
-    // Calculate game duration
+    $totalRolls = count($_SESSION['roll_history_p1'] ?? []) + count($_SESSION['roll_history_p2'] ?? []);
     $duration = time() - ($_SESSION['game_start_time'] ?? time());
     $durationFormatted = formatDuration($duration);
     
     $leaderboard[] = [
-        'username' => $_SESSION['username'],
-        'difficulty' => $_SESSION['difficulty'],
-        'player_count' => $_SESSION['player_count'],
+        'username' => $_SESSION['username'] ?? 'Anonymous',
+        'difficulty' => $_SESSION['difficulty'] ?? 'medium',
+        'player_count' => $_SESSION['player_count'] ?? 1,
         'rolls' => $totalRolls,
         'duration_seconds' => $duration,
         'duration_formatted' => $durationFormatted,
@@ -26,7 +24,6 @@ function saveLeaderboardEntry() {
 function getLeaderboard($limit = 10) {
     $leaderboard = readJsonFile(LEADERBOARD_FILE);
 
-    // Sort by rolls (fewest rolls first)
     usort($leaderboard, function ($a, $b) {
         if ($a['rolls'] == $b['rolls']) {
             return $a['duration_seconds'] <=> $b['duration_seconds'];

@@ -336,7 +336,7 @@ button:hover, .btn:hover {
 }
 
 .board-cell.warp {
-    background: linear-gradient(135deg, #a855f7, #7e22ce);
+    background: linear-gradient(135deg, #712bb2, #762a77);
     color: white;
 }
 
@@ -348,6 +348,36 @@ button:hover, .btn:hover {
 .board-cell.extra_turn {
     background: linear-gradient(135deg, #06b6d4, #0891b2);
     color: white;
+}
+
+/* Roll History Badges */
+.roll-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.roll-badge {
+    background: rgba(56, 189, 248, 0.2);
+    color: #7dd3fc;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Winner display button group */
+.success .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Make New Game button match style */
+.actions .btn {
+    margin-bottom: 0;
 }
 
 /* Events Log */

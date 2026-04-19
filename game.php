@@ -28,15 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: game.php");
         exit();
     }
+}
 
-    // Handle new game reset
-    if (isset($_POST['reset'])) {
-        $difficulty = $_SESSION['difficulty'] ?? 'medium';
-        $playerCount = $_SESSION['player_count'] ?? 1;
-        initializeGame($difficulty, $playerCount);
-        header("Location: game.php");
-        exit();
-    }
+// Handle new game
+if (isset($_GET['new'])) {
+    resetGame();
+    header("Location: game.php");
+    exit();
 }
 
 // Get current game state
@@ -55,7 +53,6 @@ $config = getBoardConfig($difficulty);
 include 'includes/header.php';
 ?>
 
-<!-- Replace your existing game display with this -->
 <div class="game-container">
     <div class="game-sidebar">
         <div class="card">
@@ -68,12 +65,22 @@ include 'includes/header.php';
             </div>
 
             <?php if (!empty($_SESSION['winner'])): ?>
-                <p class="success">🎉 You won the game!</p>
-                <a class="btn" href="leaderboard.php">View Leaderboard</a>
+                <!-- WINNER DISPLAY - This is the key addition -->
+                <div class="success" style="text-align: center; margin: 20px 0;">
+                    <h3 style="color: #86efac;">🎉 Victory! 🎉</h3>
+                    <p style="font-size: 20px; margin: 15px 0;">
+                        <?php echo sanitize($_SESSION['winner']); ?> reached cell 100!
+                    </p>
+                    <div class="button-group" style="flex-direction: column;">
+                        <a href="leaderboard.php" class="btn" style="margin-bottom: 10px;">🏆 View Leaderboard</a>
+                        <a href="game.php?new=1" class="btn">🔄 Play Again</a>
+                    </div>
+                </div>
             <?php else: ?>
+                <!-- Active game controls -->
                 <form method="POST" class="actions">
                     <button type="submit" name="roll">🎲 Roll Dice</button>
-                    <button type="submit" name="reset">Reset Game</button>
+                    <a href="game.php?new=1" class="btn" style="text-align: center;">🔄 New Game</a>
                 </form>
             <?php endif; ?>
         </div>
@@ -91,12 +98,12 @@ include 'includes/header.php';
     <div class="board-container">
         <div class="card">
             <h3>Game Board</h3>
-            <div style="overflow-x: auto;"> <!-- Add this wrapper -->
+            <div style="overflow-x: auto;">
                 <?php echo renderBoard(); ?>
             </div>
         </div>
-                </div>
-
+    </div>
+</div>
 
 <div class="card">
     <h3>📜 Adventure Log</h3>
@@ -110,6 +117,7 @@ include 'includes/header.php';
         </div>
     </div>
 </div>
+
 </main>
 </body>
 </html>
