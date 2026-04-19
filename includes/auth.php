@@ -7,6 +7,3 @@ function requireLogin() {
     }
 }
 ?>
-    </main>
-</body>
-</html>
