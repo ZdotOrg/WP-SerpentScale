@@ -5,24 +5,53 @@ require_once 'includes/auth.php';
 require_once 'includes/game_logic.php';
 require_once 'includes/leaderboard_logic.php';
 
-requireLogin();
-
-if (!isset($_SESSION['position'])) {
-    initializeGame('medium');
+// Initialize game if not started
+if (!isset($_SESSION['position_p1'])) {
+    initializeGame('medium', 1);
 }
 
+// Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    // Handle dice roll
     if (isset($_POST['roll']) && empty($_SESSION['winner'])) {
         $roll = rollDice();
-        processMove($roll);
+        $gameEnded = processMove($roll);
+        
+        // Redirect to leaderboard if game ended
+        if ($gameEnded) {
+            header("Location: leaderboard.php");
+            exit();
+        }
+        
+        // Redirect to prevent form resubmission
+        header("Location: game.php");
+        exit();
     }
 
+    // Handle new game reset
     if (isset($_POST['reset'])) {
-        initializeGame($_SESSION['difficulty'] ?? 'medium');
+        $difficulty = $_SESSION['difficulty'] ?? 'medium';
+        $playerCount = $_SESSION['player_count'] ?? 1;
+        initializeGame($difficulty, $playerCount);
+        header("Location: game.php");
+        exit();
     }
 }
 
-$config = getBoardConfig($_SESSION['difficulty']);
+// Get current game state
+$difficulty = $_SESSION['difficulty'] ?? 'medium';
+$playerCount = $_SESSION['player_count'] ?? 1;
+$currentPlayer = $_SESSION['current_player'] ?? 1;
+$positionP1 = $_SESSION['position_p1'] ?? 0;
+$positionP2 = $_SESSION['position_p2'] ?? 0;
+$winner = $_SESSION['winner'] ?? null;
+$lastRoll = $_SESSION['last_roll'] ?? null;
+$lastEvent = $_SESSION['last_event'] ?? null;
+$eventsLog = $_SESSION['events_log'] ?? [];
+
+$config = getBoardConfig($difficulty);
+
 include 'includes/header.php';
 ?>
 
@@ -66,7 +95,7 @@ include 'includes/header.php';
                 <?php echo renderBoard(); ?>
             </div>
         </div>
-    </div
+                </div>
 
 
 <div class="card">

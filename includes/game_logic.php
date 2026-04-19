@@ -8,7 +8,7 @@ require_once __DIR__ . '/leaderboard_logic.php';
 function getBoardConfig($difficulty = 'medium') {
     $easy = [
         'snakes' => [
-            99 => ['end' => 80, 'color' => '#35008b'],  // Dark red
+            99 => ['end' => 80, 'color' => '#8b0000'],  // Dark red
             92 => ['end' => 72, 'color' => '#B22222'],  // Firebrick
             74 => ['end' => 53, 'color' => '#DC143C']   // Crimson
         ],
@@ -24,7 +24,7 @@ function getBoardConfig($difficulty = 'medium') {
 
     $medium = [
         'snakes' => [
-            98 => ['end' => 79, 'color' => '#bdd790'],
+            98 => ['end' => 79, 'color' => '#da6e6e'],
             95 => ['end' => 75, 'color' => '#B22222'],
             83 => ['end' => 19, 'color' => '#DC143C'],
             73 => ['end' => 53, 'color' => '#FF4500'],  // Orange red
@@ -302,16 +302,17 @@ function processMove($roll) {
 
 function renderBoard() {
     $positions = [
-        1 => $_SESSION['position_p1'],
-        2 => $_SESSION['position_p2']
+        1 => $_SESSION['position_p1'] ?? 0,
+        2 => $_SESSION['position_p2'] ?? 0
     ];
     $playerCount = $_SESSION['player_count'] ?? 1;
-    $config = getBoardConfig($_SESSION['difficulty']);
+    $config = getBoardConfig($_SESSION['difficulty'] ?? 'medium');
     $snakes = $config['snakes'];
     $ladders = $config['ladders'];
     $eventCells = getEventCells();
     
-    $html = '<div class="game-board">';
+    $html = '<div class="game-board-wrapper">';
+    $html .= '<div class="game-board">';
     
     for ($row = 0; $row < 10; $row++) {
         $html .= '<div class="board-row">';
@@ -326,52 +327,78 @@ function renderBoard() {
                 $cellNum = $startCell - 9 + $col;
             }
             
-            // Get special colors
-            $specialColor = '';
+            // Determine special cell type
             $specialType = '';
             $specialEnd = '';
+            $specialColor = '';
             
             if (isset($snakes[$cellNum])) {
                 $specialType = 'snake';
-                $specialColor = $snakes[$cellNum]['color'];
                 $specialEnd = $snakes[$cellNum]['end'];
+                $specialColor = $snakes[$cellNum]['color'];
             } elseif (isset($ladders[$cellNum])) {
                 $specialType = 'ladder';
-                $specialColor = $ladders[$cellNum]['color'];
                 $specialEnd = $ladders[$cellNum]['end'];
+                $specialColor = $ladders[$cellNum]['color'];
             } elseif (isset($eventCells[$cellNum])) {
                 $specialType = $eventCells[$cellNum]['type'];
                 $specialColor = getEventColor($eventCells[$cellNum]['type']);
             }
             
-            // Check which players are on this cell
-            $players = [];
-            if ($positions[1] == $cellNum) $players[] = 'P1';
-            if ($playerCount == 2 && $positions[2] == $cellNum) $players[] = 'P2';
-            
-            $playerClass = !empty($players) ? 'has-player' : '';
-            $playerMarker = !empty($players) ? '<div class="player-marker">' . implode('', $players) . '</div>' : '';
-            
             // Build inline style for color
-            $style = $specialColor ? 'style="background: ' . $specialColor . '20; border-left: 4px solid ' . $specialColor . ';"' : '';
+            $style = $specialColor ? 'style="background: linear-gradient(135deg, ' . $specialColor . ', ' . adjustBrightness($specialColor, -30) . ');"' : '';
+            
+            // Determine which players are on this cell
+            $playersHere = [];
+            if ($positions[1] == $cellNum) $playersHere[] = 1;
+            if ($playerCount == 2 && $positions[2] == $cellNum) $playersHere[] = 2;
+            
+            // Build player markers HTML (Purple for P1, Forest Green for P2)
+            $playerMarkers = '';
+            if (!empty($playersHere)) {
+                $playerMarkers = '<div class="player-marker">';
+                foreach ($playersHere as $p) {
+                    $playerClass = ($p == 1) ? 'player-p1' : 'player-p2';
+                    $playerMarkers .= '<span class="' . $playerClass . '">P' . $p . '</span>';
+                }
+                $playerMarkers .= '</div>';
+            }
+            
+            // Build special info (ONLY destination arrow, no small emoji)
+            $specialInfo = '';
+            if ($specialType) {
+                $icon = match($specialType) {
+                    'snake' => '🐍',
+                    'ladder' => '🪜',
+                    'bonus' => '✨',
+                    'penalty' => '⚠️',
+                    'warp' => '🌀',
+                    'skip' => '📖',
+                    'mystery' => '🎁',
+                    'extra_turn' => '🔄',
+                    default => '✨'
+                };
+                
+                $specialInfo = '<div class="special-info">';
+                $specialInfo .= '<span class="special-icon">' . $icon . '</span>';
+                if ($specialEnd) {
+                    $specialInfo .= '<span class="special-destination">→ ' . $specialEnd . '</span>';
+                }
+                $specialInfo .= '</div>';
+            }
             
             $html .= sprintf(
-                '<div class="board-cell %s" %s data-cell="%d" data-special-end="%s">
+                '<div class="board-cell %s" %s data-cell="%d">
                     <span class="cell-number">%d</span>
-                    <div class="special-info">
-                        %s
-                        %s
-                    </div>
+                    %s
                     %s
                 </div>',
                 $specialType ?: '',
                 $style,
                 $cellNum,
-                $specialEnd,
                 $cellNum,
-                $specialType ? '<span class="special-icon">' . ($specialType == 'snake' ? '🐍' : ($specialType == 'ladder' ? '🪜' : '✨')) . '</span>' : '',
-                $specialEnd ? '<span class="special-destination">→ ' . $specialEnd . '</span>' : '',
-                $playerMarker
+                $specialInfo,
+                $playerMarkers
             );
         }
         
@@ -379,7 +406,27 @@ function renderBoard() {
     }
     
     $html .= '</div>';
+    $html .= '</div>';
     return $html;
+}
+
+/**
+ * Helper function to darken a color for gradient
+ */
+function adjustBrightness($hex, $percent) {
+    $hex = ltrim($hex, '#');
+    if (strlen($hex) == 3) {
+        $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+    }
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    
+    $r = max(0, min(255, $r + $percent));
+    $g = max(0, min(255, $g + $percent));
+    $b = max(0, min(255, $b + $percent));
+    
+    return sprintf("#%02x%02x%02x", $r, $g, $b);
 }
 
 function getEventColor($type) {
