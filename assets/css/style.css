@@ -40,7 +40,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 36px auto;
     padding: 20px;
 }
@@ -206,96 +206,211 @@ button:hover {
     animation: fadeUp 0.4s ease;
 }
 
-.board {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 8px;
-    margin-top: 18px;
+/* ============ NEW BOARD STYLES FOR renderBoard() ============ */
+.game-container {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
 }
 
-.cell {
-    position: relative;
-    background: #1e293b;
-    padding: 10px 8px;
-    text-align: center;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-weight: bold;
-    min-height: 58px;
+.game-sidebar {
+    flex: 1;
+    min-width: 280px;
+}
+
+.board-container {
+    flex: 3;
+    min-width: 0;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.game-board {
     display: flex;
+    flex-direction: column;
+    border: 2px solid #38bdf8;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+}
+
+.board-row {
+    display: flex;
+}
+
+.board-cell {
+    width: 70px;
+    height: 70px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    transition: all 0.3s ease;
-    overflow: hidden;
+    position: relative;
+    background: #1e293b;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
-.cell:hover {
-    transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.12);
+.board-cell:hover {
+    transform: scale(1.02);
+    z-index: 1;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    border-color: #38bdf8;
 }
 
-.player {
-    background: #22c55e;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
-    transform: scale(1.05);
-    animation: tokenLand 0.5s ease;
-}
-
-.snake {
+/* Snake styles */
+.board-cell.snake {
     background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
+    position: relative;
     animation: snakeWiggle 2s ease-in-out infinite;
 }
 
-.ladder {
+.board-cell.snake::before {
+    content: '🐍';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 20px;
+    opacity: 0.8;
+}
+
+/* Ladder styles */
+.board-cell.ladder {
     background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: white;
     animation: ladderShimmer 2s ease-in-out infinite;
 }
 
-.event-cell {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+.board-cell.ladder::before {
+    content: '🪜';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 18px;
+}
+
+/* Event cell styles */
+.board-cell.bonus {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.board-cell.penalty {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.board-cell.warp {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
     animation: eventPulse 2s ease-in-out infinite;
 }
 
-.cell-icon {
-    position: absolute;
-    top: 4px;
-    right: 6px;
-    font-size: 16px;
-    opacity: 0.95;
+.board-cell.skip {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-.snake-icon {
-    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
-    animation: snakeHiss 3s ease-in-out infinite;
-}
-
-.ladder-icon {
-    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
-}
-
-.event-icon {
+.board-cell.mystery {
+    background: linear-gradient(135deg, #ec4899, #be185d);
     animation: sparkle 1.5s ease-in-out infinite;
 }
 
-.token {
-    font-size: 18px;
-    line-height: 1;
-    margin-bottom: 4px;
-    z-index: 2;
-    animation: tokenMove 0.5s ease;
+.board-cell.extra_turn {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
 }
 
 .cell-number {
-    z-index: 2;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    position: absolute;
+    top: 3px;
+    left: 5px;
 }
 
-/* AI Narrator Styles */
+.special-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.special-destination {
+    font-size: 9px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2px 5px;
+    border-radius: 10px;
+    margin-top: 2px;
+}
+
+.player-marker {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 20px;
+    min-width: 28px;
+    text-align: center;
+    z-index: 2;
+    backdrop-filter: blur(2px);
+}
+
+.has-player {
+    box-shadow: 0 0 0 2px #22c55e, inset 0 0 0 1px rgba(255,255,255,0.2);
+    background: rgba(34, 197, 94, 0.15);
+}
+
+/* Roll History */
+.roll-history {
+    margin-top: 20px;
+}
+
+.roll-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.roll-badge {
+    display: inline-block;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    color: #0f172a;
+    font-weight: bold;
+    border-radius: 10px;
+    font-size: 16px;
+    animation: fadeUp 0.3s ease;
+}
+
+/* Events Log */
+.events-log {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.log-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.log-entry {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid #38bdf8;
+    font-size: 14px;
+    animation: slideIn 0.3s ease;
+}
+
+/* AI Narrator */
 .ai-narrator {
     background: rgba(139, 92, 246, 0.15);
     border: 2px solid #8b5cf6;
@@ -318,92 +433,35 @@ button:hover {
     margin: 0;
 }
 
-/* Adventure Recap Styles */
-.adventure-recap {
-    background: rgba(56, 189, 248, 0.1);
-    border: 2px solid #38bdf8;
-    border-radius: 14px;
+/* Leaderboard */
+.leaderboard-container {
     padding: 20px;
-    margin: 20px 0;
-    max-height: 400px;
-    overflow-y: auto;
 }
 
-.adventure-recap h3 {
-    color: #7dd3fc;
-    margin-bottom: 14px;
-}
-
-.adventure-recap ul {
-    list-style: none;
-    padding: 0;
-}
-
-.adventure-recap li {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px 14px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-    border-left: 3px solid #38bdf8;
-}
-
-ul {
-    padding-left: 20px;
-}
-
-li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-}
-
-table {
+.leaderboard-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 16px;
-    background: rgba(255, 255, 255, 0.03);
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     overflow: hidden;
 }
 
-th,
-td {
+.leaderboard-table th,
+.leaderboard-table td {
     padding: 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-th {
+.leaderboard-table th {
+    background: rgba(56, 189, 248, 0.2);
     color: #7dd3fc;
+    font-weight: bold;
 }
 
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-top: 16px;
-}
-
-.feature {
-    background: rgba(255,255,255,0.06);
-    padding: 18px;
-    border-radius: 14px;
-    text-align: center;
-    transition: 0.2s ease;
-}
-
-.feature:hover {
-    transform: translateY(-4px);
-    background: rgba(255,255,255,0.1);
-}
-
-.feature h4 {
-    margin-bottom: 10px;
-    color: #38bdf8;
-}
-
-.feature p {
-    font-size: 14px;
-    color: #cbd5e1;
+.leaderboard-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* Animations */
@@ -418,82 +476,36 @@ th {
     }
 }
 
-@keyframes tokenMove {
-    0% {
-        transform: scale(0.5) rotate(0deg);
-        opacity: 0.5;
-    }
-    50% {
-        transform: scale(1.2) rotate(180deg);
-    }
-    100% {
-        transform: scale(1) rotate(360deg);
-        opacity: 1;
-    }
-}
-
-@keyframes tokenLand {
-    0% {
-        transform: scale(1.05) translateY(-20px);
+@keyframes slideIn {
+    from {
         opacity: 0;
+        transform: translateX(-20px);
     }
-    50% {
-        transform: scale(1.15);
-    }
-    100% {
-        transform: scale(1.05);
+    to {
         opacity: 1;
+        transform: translateX(0);
     }
 }
 
 @keyframes snakeWiggle {
-    0%, 100% {
-        transform: rotate(0deg);
-    }
-    25% {
-        transform: rotate(1deg);
-    }
-    75% {
-        transform: rotate(-1deg);
-    }
-}
-
-@keyframes snakeHiss {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(1deg); }
+    75% { transform: rotate(-1deg); }
 }
 
 @keyframes ladderShimmer {
-    0%, 100% {
-        filter: brightness(1);
-    }
-    50% {
-        filter: brightness(1.2);
-    }
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
 }
 
 @keyframes eventPulse {
-    0%, 100% {
-        box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
-    }
-    50% {
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
-    }
+    0%, 100% { box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.8); }
 }
 
 @keyframes sparkle {
-    0%, 100% {
-        transform: scale(1) rotate(0deg);
-        opacity: 0.8;
-    }
-    50% {
-        transform: scale(1.2) rotate(180deg);
-        opacity: 1;
-    }
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+    50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
 }
 
 @keyframes narratorAppear {
@@ -508,17 +520,19 @@ th {
 }
 
 @keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
-    }
+    0%, 100% { box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.7); }
 }
 
-@media (max-width: 900px) {
-    .features-grid {
-        grid-template-columns: repeat(2, 1fr);
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .board-cell {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .special-icon {
+        font-size: 22px;
     }
 }
 
@@ -540,8 +554,42 @@ th {
     .info-grid {
         grid-template-columns: 1fr;
     }
+    
+    .game-container {
+        flex-direction: column;
+    }
+    
+    .board-container {
+        min-width: auto;
+    }
+    
+    .board-cell {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .special-icon {
+        font-size: 18px;
+    }
+    
+    .player-marker {
+        font-size: 10px;
+        padding: 1px 3px;
+        min-width: 20px;
+    }
+}
 
-    .board {
-        grid-template-columns: repeat(5, 1fr);
+@media (max-width: 480px) {
+    .board-cell {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .special-icon {
+        font-size: 14px;
+    }
+    
+    .cell-number {
+        font-size: 8px;
     }
 }
