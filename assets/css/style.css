@@ -176,6 +176,14 @@ button:hover {
     background: rgba(255, 255, 255, 0.06);
     padding: 14px;
     border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.info-box.current-turn {
+    background: rgba(56, 189, 248, 0.2);
+    border: 2px solid #38bdf8;
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    animation: pulse 2s ease-in-out infinite;
 }
 
 .actions {
@@ -218,7 +226,7 @@ button:hover {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    transition: 0.2s ease;
+    transition: all 0.3s ease;
     overflow: hidden;
 }
 
@@ -234,16 +242,24 @@ button:hover {
     font-weight: bold;
     box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
     transform: scale(1.05);
+    animation: tokenLand 0.5s ease;
 }
 
 .snake {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
+    animation: snakeWiggle 2s ease-in-out infinite;
 }
 
 .ladder {
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
+    animation: ladderShimmer 2s ease-in-out infinite;
+}
+
+.event-cell {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    animation: eventPulse 2s ease-in-out infinite;
 }
 
 .cell-icon {
@@ -256,10 +272,15 @@ button:hover {
 
 .snake-icon {
     filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
+    animation: snakeHiss 3s ease-in-out infinite;
 }
 
 .ladder-icon {
     filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.35));
+}
+
+.event-icon {
+    animation: sparkle 1.5s ease-in-out infinite;
 }
 
 .token {
@@ -267,10 +288,63 @@ button:hover {
     line-height: 1;
     margin-bottom: 4px;
     z-index: 2;
+    animation: tokenMove 0.5s ease;
 }
 
 .cell-number {
     z-index: 2;
+}
+
+/* AI Narrator Styles */
+.ai-narrator {
+    background: rgba(139, 92, 246, 0.15);
+    border: 2px solid #8b5cf6;
+    border-radius: 14px;
+    padding: 18px;
+    margin: 16px 0;
+    animation: narratorAppear 0.6s ease;
+}
+
+.ai-narrator h4 {
+    color: #a78bfa;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.ai-narrator p {
+    color: #e9d5ff;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Adventure Recap Styles */
+.adventure-recap {
+    background: rgba(56, 189, 248, 0.1);
+    border: 2px solid #38bdf8;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 20px 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.adventure-recap h3 {
+    color: #7dd3fc;
+    margin-bottom: 14px;
+}
+
+.adventure-recap ul {
+    list-style: none;
+    padding: 0;
+}
+
+.adventure-recap li {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 3px solid #38bdf8;
 }
 
 ul {
@@ -332,6 +406,7 @@ th {
     color: #cbd5e1;
 }
 
+/* Animations */
 @keyframes fadeUp {
     from {
         opacity: 0;
@@ -340,6 +415,104 @@ th {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes tokenMove {
+    0% {
+        transform: scale(0.5) rotate(0deg);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+    }
+}
+
+@keyframes tokenLand {
+    0% {
+        transform: scale(1.05) translateY(-20px);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+}
+
+@keyframes snakeWiggle {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(1deg);
+    }
+    75% {
+        transform: rotate(-1deg);
+    }
+}
+
+@keyframes snakeHiss {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes ladderShimmer {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.2);
+    }
+}
+
+@keyframes eventPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+    }
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+@keyframes narratorAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
     }
 }
 
